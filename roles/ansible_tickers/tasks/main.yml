@@ -5,3 +5,78 @@
     t: "{{ tickers_defaults | combine(tickers, recursive=True) }}"
   tags:
     - always
+
+- name: Install needed packages
+  package:
+    name: "{{ t.packages }}"
+    state: present
+
+- name: Ensure project directories
+  become: yes
+  become_user: root
+  file:
+    state: directory
+    path: "{{ item }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0755
+  with_items:
+    - "{{ t.project_dir }}"
+    - "{{ t.celery.log_dirname }}"
+    - "{{ t.celery.pid_basedir }}/{{ t.celery.pid_dirname }}"
+
+- name: Checkout repository
+  become: yes
+  become_user: "{{ ansible_user }}"
+  git:
+    accept_hostkey: no
+    depth: 1
+    dest: "{{ t.project_dir }}"
+    force: yes
+    repo: "{{ t.repo_path }}"
+    update: yes
+    version: "{{ t.repo_branch }}"
+  notify:
+    - gunicorn restart
+    - celery restart
+
+- name: Ensure virtualenv
+  become: yes
+  become_user: "{{ ansible_user }}"
+  pip:
+    virtualenv: "{{ v.project_dir }}/{{ v.venv_name }}"
+    name: pip
+    state: latest
+
+- name: Ensure virtualenv with project requirements
+  become: yes
+  become_user: "{{ ansible_user }}"
+  pip:
+    virtualenv: "{{ v.project_dir }}/{{ v.venv_name }}"
+    requirements: "{{ v.project_dir }}/requirements.txt"
+
+- name: Run DB migrations
+  command: "{{ v.project_dir }}/{{ v.venv_name }}/bin/python manage.py db upgrade"
+  args:
+    chdir: "{{ v.project_dir }}"
+  changed_when: false
+
+- name: Place celeryd config
+  become: yes
+  become_user: root
+  template:
+    src: celeryd.j2
+    dest: /etc/default/celeryd
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - celery restart
+
+- name: Include systemd tasks
+  include_tasks: systemd.yml
+  loop:
+    - gunicorn
+    - celery
+  loop_control:
+    loop_var: service_name

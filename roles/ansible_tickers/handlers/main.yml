@@ -1,2 +1,19 @@
 ---
 # handlers file for ansible_tickers
+- name: gunicorn restart
+  become: yes
+  become_user: root
+  systemd:
+    name: gunicorn.service
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+
+- name: celery restart
+  become: yes
+  become_user: root
+  systemd:
+    name: celery.service
+    state: restarted
+    enabled: yes
+    daemon_reload: yes

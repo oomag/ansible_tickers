@@ -9,6 +9,11 @@ tickers:
       - "tickers"
 
 tickers_defaults:
+  repo_path: git@github.com:Ageres210784/tickers.git
+  project_name: tickers
+  project_dir: "/var/www/tickers"
+  repo_branch: master
+  enable_debug: false
   # System vars
   venv_name: venv
   packages:
@@ -29,7 +34,7 @@ tickers_defaults:
     loglevel: WARNING
     log_dirname: /var/log/celery
     log_filepattern: "%n%I.log"
-    pid_basedir: /run
+    pid_basedir: /var/run
     pid_dirname: celery
     pid_filepattern: "%n.pid"
   # Gunicorn vars
@@ -44,3 +49,4 @@ tickers_defaults:
   redis_host: localhost
   redis_port: 6379
   redis_db_index: 0
+ 
