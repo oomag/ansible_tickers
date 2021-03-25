@@ -1,0 +1,46 @@
+---
+# defaults file for ansible_tickers
+tickers: 
+  sql:
+    user: tickers
+    secret: "tickers"
+    db:
+      - "tickers_test"
+      - "tickers"
+
+tickers_defaults:
+  # System vars
+  venv_name: venv
+  packages:
+    - redis-server
+    - python3-pip
+#    - mariadb-server
+    - python3-virtualenv
+  # SQL settings
+  sql:
+    user: user
+    secret: password
+    db: db_name
+    host: localhost
+    port: 3306
+  # Celery vars
+  celery:
+    appname: workername.celery_worker.celery
+    loglevel: WARNING
+    log_dirname: /var/log/celery
+    log_filepattern: "%n%I.log"
+    pid_basedir: /run
+    pid_dirname: celery
+    pid_filepattern: "%n.pid"
+  # Gunicorn vars
+  gunicorn:
+    pid_basedir: /run
+    pid_dirname: gunicorn
+    pid_filename: gunicorn.pid
+    socket_name: cryptoprocessing.sock
+    log_dirname: /var/log/gunicorn
+    log_filename: cryptoprocessing-err.log
+  # Cache settings
+  redis_host: localhost
+  redis_port: 6379
+  redis_db_index: 0

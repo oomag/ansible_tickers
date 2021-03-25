@@ -1,0 +1,13 @@
+---
+
+mariadb_repository_url: http://yum.mariadb.org/{{ mariadb_version }}/{{ ansible_distribution|lower }}{{ ansible_distribution_major_version|lower }}-amd64
+
+mariadb_conf_file: /etc/my.cnf
+mariadb_include_dir: /etc/my.cnf.d/
+mariadb_socket_file: {{ mariadb_datadir }}/mysql.sock
+
+mariadb_base_packages:
+  - MariaDB-server
+  - MariaDB-client
+  - MariaDB-shared
+  - MySQL-python

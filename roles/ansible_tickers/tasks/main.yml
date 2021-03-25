@@ -1,0 +1,7 @@
+---
+# tasks file for ansible_tickers
+- name: Merge user values with defaults
+  set_fact:
+    t: "{{ tickers_defaults | combine(tickers, recursive=True) }}"
+  tags:
+    - always

@@ -1,0 +1,8 @@
+---
+
+- name: Manage databases
+  mysql_db:
+    name: "{{ item.name }}"
+    state: "{{ item.state | default('present') }}"
+    login_unix_socket: /run/mysqld/mysqld.sock
+  loop: "{{ mariadb_databases }}"
