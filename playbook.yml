@@ -51,19 +51,19 @@
   #     src: .my.cnf
   #     dest: /root/.my.cnf
 
-  - name: Create the MySQL databases tickers and tickers_test
-    mysql_db:
-      name:
-      - "tickers_test"
-      - "tickers"
-      state: present
+  # - name: Create the MySQL databases tickers and tickers_test
+  #   mysql_db:
+  #     name:
+  #     - "tickers_test"
+  #     - "tickers"
+  #     state: present
 
-  - name: Create database user
-    mysql_user:
-      name: tickers
-      password: "tickers"
-      priv: 'tickers.*:ALL/tickers_test.*:ALL'
-      state: present
+  # - name: Create database user
+  #   mysql_user:
+  #     name: tickers
+  #     password: "tickers"
+  #     priv: 'tickers.*:ALL/tickers_test.*:ALL'
+  #     state: present
 
   # - name: Clone git
   #   git:

@@ -10,7 +10,7 @@ tickers:
 
 tickers_defaults:
   repo_path: git@github.com:Ageres210784/tickers.git
-  project_name: tickers
+  project_name: ticker
   project_dir: "/var/www/tickers"
   repo_branch: master
   enable_debug: false
@@ -30,11 +30,11 @@ tickers_defaults:
     port: 3306
   # Celery vars
   celery:
-    appname: workername.celery_worker.celery
+    appname: ticker.celery_worker.celery
     loglevel: WARNING
     log_dirname: /var/log/celery
     log_filepattern: "%n%I.log"
-    pid_basedir: /var/run
+    pid_basedir: /run
     pid_dirname: celery
     pid_filepattern: "%n.pid"
   # Gunicorn vars
@@ -46,7 +46,7 @@ tickers_defaults:
     log_dirname: /var/log/gunicorn
     log_filename: cryptoprocessing-err.log
   # Cache settings
-  redis_host: localhost
-  redis_port: 6379
-  redis_db_index: 0
+  # redis_host: localhost
+  # redis_port: 6379
+  # redis_db_index: 0
  

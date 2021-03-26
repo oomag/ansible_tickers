@@ -4,13 +4,18 @@ After=network.target
 
 [Service]
 Type=forking
-User=deployer
-Group=deployer
+User={{ ansible_user }}
+Group={{ ansible_user }}
 EnvironmentFile=-/etc/default/celeryd
-WorkingDirectory=/home/deployer/tickers
+WorkingDirectory={{ t.project_dir }}
 PrivateTmp=true
 Restart=on-failure
 NoNewPrivileges=yes
+#
+PermissionsStartOnly=true
+RuntimeDirectory={{ v.celery.pid_dirname }}
+RuntimeDirectoryMode=0750
+#
 ExecStart=/bin/sh -c '${CELERY_BIN} multi start ${CELERYD_NODES} \
   -A ${CELERY_APP} --pidfile=${CELERYD_PID_FILE} \
   --logfile=${CELERYD_LOG_FILE} --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}'

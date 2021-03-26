@@ -8,16 +8,16 @@ CELERYD_NODES="ticker_worker"
 #CELERYD_NODES=10
 
 # Absolute or relative path to the 'celery' command:
-CELERY_BIN="/home/deployer/tickers/venv/bin/celery"
+CELERY_BIN="{{ t.project_dir }}/{{ t.venv_name }}/bin/celery"
 
 # App instance to use
 # comment out this line if you don't use an app
-CELERY_APP="ticker.celery_worker.celery"
+CELERY_APP="{{ t.celery.appname }}"
 # or fully qualified:
 #CELERY_APP="proj.tasks:app"
 
 # Where to chdir at start.
-CELERYD_CHDIR="/home/deployer/tickers"
+CELERYD_CHDIR="{{ t.project_dir }}"
 
 # Extra command-line arguments to the worker
 CELERYD_OPTS="--concurrency=10"
@@ -25,17 +25,17 @@ CELERYD_OPTS="--concurrency=10"
 # CELERYD_OPTS="-c 8 -c:worker2 4 -c:worker3 2 -Ofair:worker1"
 
 # Set logging level to WARNING
-CELERYD_LOG_LEVEL="WARNING"
+CELERYD_LOG_LEVEL="{{ t.celery.loglevel }}"
 
 # %n will be replaced with the first part of the nodename.
-CELERYD_LOG_FILE="/var/log/celery/%n%I.log"
-CELERYD_PID_FILE="/var/run/celery/%n.pid"
+CELERYD_LOG_FILE="{{ t.celery.log_dirname }}/{{ t.celery.log_filepattern }}"
+CELERYD_PID_FILE="{{ t.celery.pid_basedir }}/{{ t.celery.pid_dirname }}/{{ t.celery.pid_filepattern }}"
 
 # Workers should run as an unprivileged user.
 #   You need to create this user manually (or you can choose
 #   a user/group combination that already exists (e.g., nobody).
-CELERYD_USER="deployer"
-CELERYD_GROUP="deployer"
+CELERYD_USER="{{ ansible_user }}"
+CELERYD_GROUP="{{ ansible_user }}"
 
 # If enabled pid and log directories will be created if missing,
 # and owned by the userid/group configured.
