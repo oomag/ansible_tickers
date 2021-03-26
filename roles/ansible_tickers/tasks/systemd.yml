@@ -12,12 +12,12 @@
     - "{{ service_name }} restart"
   register: service
 
-- name: "Reload systemd daemon for {{ service_name }}"
-  become: yes
-  become_user: root
-  systemd:
-    daemon_reload: yes
-  when: service.changed
+# - name: "Reload systemd daemon for {{ service_name }}"
+#   become: yes
+#   become_user: root
+#   systemd:
+#     daemon_reload: yes
+#   when: service.changed
 
 - name: "Ensure that {{ service_name }} service started"
   become: yes
@@ -25,6 +25,7 @@
   systemd:
     name: "{{ service_name }}"
     state: started
+    daemon_reload: yes
 
 - name: "Ensure {{ service_name }} enabled in systemd"
   become: yes

@@ -10,8 +10,8 @@ RuntimeDirectory={{ t.gunicorn.pid_dirname }}
 RuntimeDirectoryMode=0755
 Restart=on-failure
 WorkingDirectory={{ t.project_dir }}
-# ExecStart=/home/deployer/tickers/venv/bin/gunicorn wsgi:app -c /home/deployer/tickers/gunicorn_config.py
-ExecStart={{ t.project_dir }}/{{ t.venv_name }}/bin/gunicorn --worker-class eventlet --pid {{ t.gunicorn.pid_basedir }}/{{ t.gunicorn.pid_dirname }}/{{ t.gunicorn.pid_filename }} --bind unix:{{ t.gunicorn.pid_basedir }}/{{ t.gunicorn.pid_dirname }}/{{ t.gunicorn.socket_name }} wsgi:app --workers=5 --capture-output --error-logfile {{ t.gunicorn.log_dirname }}/{{ t.gunicorn.log_filename }}
+ExecStart={{ t.project_dir }}/{{ t.venv_name }}/bin/gunicorn wsgi:app -c {{ t.project_dir }}/gunicorn_config.py
+# ExecStart={{ t.project_dir }}/{{ t.venv_name }}/bin/gunicorn --worker-class eventlet --pid {{ t.gunicorn.pid_basedir }}/{{ t.gunicorn.pid_dirname }}/{{ t.gunicorn.pid_filename }} --bind unix:{{ t.gunicorn.pid_basedir }}/{{ t.gunicorn.pid_dirname }}/{{ t.gunicorn.socket_name }} wsgi:app --workers=5 --capture-output --error-logfile {{ t.gunicorn.log_dirname }}/{{ t.gunicorn.log_filename }}
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
 PrivateTmp=true

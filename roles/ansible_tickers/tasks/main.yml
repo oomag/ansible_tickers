@@ -23,7 +23,9 @@
   with_items:
     - "{{ t.project_dir }}"
     - "{{ t.celery.log_dirname }}"
+    - "{{ t.gunicorn.log_dirname }}"
     - "{{ t.celery.pid_basedir }}/{{ t.celery.pid_dirname }}"
+    - "{{ t.gunicorn.pid_basedir }}/{{ t.gunicorn.pid_dirname }}"
 
 - name: Checkout repository
   become: yes
@@ -40,11 +42,21 @@
     - gunicorn restart
     - celery restart
 
+- name: Put project configs in place
+  template:
+    src: "gunicorn_config.py.j2"
+    dest: "{{ t.project_dir }}/gunicorn_config.py"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0640
+  notify:
+    - gunicorn restart
+
 - name: Ensure virtualenv
   become: yes
   become_user: "{{ ansible_user }}"
   pip:
-    virtualenv: "{{ v.project_dir }}/{{ v.venv_name }}"
+    virtualenv: "{{ t.project_dir }}/{{ t.venv_name }}"
     name: pip
     state: latest
 
@@ -52,14 +64,14 @@
   become: yes
   become_user: "{{ ansible_user }}"
   pip:
-    virtualenv: "{{ v.project_dir }}/{{ v.venv_name }}"
-    requirements: "{{ v.project_dir }}/requirements.txt"
+    virtualenv: "{{ t.project_dir }}/{{ t.venv_name }}"
+    requirements: "{{ t.project_dir }}/requirements.txt"
 
-- name: Run DB migrations
-  command: "{{ v.project_dir }}/{{ v.venv_name }}/bin/python manage.py db upgrade"
-  args:
-    chdir: "{{ v.project_dir }}"
-  changed_when: false
+# - name: Run DB migrations
+#   command: "{{ t.project_dir }}/{{ t.venv_name }}/bin/python manage.py db upgrade"
+#   args:
+#     chdir: "{{ t.project_dir }}"
+#   changed_when: false
 
 - name: Place celeryd config
   become: yes

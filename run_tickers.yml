@@ -1,6 +1,6 @@
 ---
 - name: Configure target services
-  hosts: home
+  hosts: tickers
 
   roles:
     - ansible_tickers

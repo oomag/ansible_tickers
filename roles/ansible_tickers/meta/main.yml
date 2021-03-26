@@ -49,7 +49,7 @@ galaxy_info:
 
 dependencies:
   # Здесь мы ставим мариадб с нужными пользователями и базами
-  - mariadb
+  - role: mariadb
     mariadb_users:
       - name: tickers
         password: "tickers"
