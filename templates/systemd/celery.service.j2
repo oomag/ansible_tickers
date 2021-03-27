@@ -7,13 +7,13 @@ Type=forking
 User={{ ansible_user }}
 Group={{ ansible_user }}
 EnvironmentFile=-/etc/default/celeryd
-WorkingDirectory={{ t.project_dir }}
+WorkingDirectory={{ v.project_dir }}
 PrivateTmp=true
 Restart=on-failure
 NoNewPrivileges=yes
 #
 PermissionsStartOnly=true
-RuntimeDirectory={{ t.celery.pid_dirname }}
+RuntimeDirectory={{ v.celery.pid_dirname }}
 RuntimeDirectoryMode=0750
 #
 ExecStart=/bin/sh -c '${CELERY_BIN} multi start ${CELERYD_NODES} \

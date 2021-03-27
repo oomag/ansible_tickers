@@ -1,1 +1,0 @@
-deployer ALL=(ALL:ALL) NOPASSWD: ALL
