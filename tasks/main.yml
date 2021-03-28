@@ -2,13 +2,13 @@
 # tasks file for ansible_tickers
 - name: Merge user values with defaults
   set_fact:
-    t: "{{ tickers_defaults | combine(tickers, recursive=True) }}"
+    v: "{{ tickers_defaults | combine(tickers, recursive=True) }}"
   tags:
     - always
 
 - name: Install needed packages
   package:
-    name: "{{ t.packages }}"
+    name: "{{ v.packages }}"
     state: present
 
 - name: Ensure project directories
@@ -21,11 +21,11 @@
     group: "{{ ansible_user }}"
     mode: 0755
   with_items:
-    - "{{ t.project_dir }}"
-    - "{{ t.celery.log_dirname }}"
-    - "{{ t.gunicorn.log_dirname }}"
-    - "{{ t.celery.pid_basedir }}/{{ t.celery.pid_dirname }}"
-    - "{{ t.gunicorn.pid_basedir }}/{{ t.gunicorn.pid_dirname }}"
+    - "{{ v.project_dir }}"
+    - "{{ v.celery.log_dirname }}"
+    - "{{ v.gunicorn.log_dirname }}"
+    - "{{ v.celery.pid_basedir }}/{{ v.celery.pid_dirname }}"
+    - "{{ v.gunicorn.pid_basedir }}/{{ v.gunicorn.pid_dirname }}"
 
 - name: Checkout repository
   become: yes
@@ -33,11 +33,11 @@
   git:
     accept_hostkey: no
     depth: 1
-    dest: "{{ t.project_dir }}"
+    dest: "{{ v.project_dir }}"
     force: yes
-    repo: "{{ t.repo_path }}"
+    repo: "{{ v.repo_path }}"
     update: yes
-    version: "{{ t.repo_branch }}"
+    version: "{{ v.repo_branch }}"
   notify:
     - gunicorn restart
     - celery restart
@@ -45,7 +45,7 @@
 - name: Put project configs in place
   template:
     src: "gunicorn_config.py.j2"
-    dest: "{{ t.project_dir }}/gunicorn_config.py"
+    dest: "{{ v.project_dir }}/gunicorn_config.py"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: 0640
@@ -56,7 +56,7 @@
   become: yes
   become_user: "{{ ansible_user }}"
   pip:
-    virtualenv: "{{ t.project_dir }}/{{ t.venv_name }}"
+    virtualenv: "{{ v.project_dir }}/{{ v.venv_name }}"
     name: pip
     state: latest
 
@@ -64,14 +64,15 @@
   become: yes
   become_user: "{{ ansible_user }}"
   pip:
-    virtualenv: "{{ t.project_dir }}/{{ t.venv_name }}"
-    requirements: "{{ t.project_dir }}/requirements.txt"
+    virtualenv: "{{ v.project_dir }}/{{ v.venv_name }}"
+    requirements: "{{ v.project_dir }}/requirements.txt"
 
-# - name: Run DB migrations
-#   command: "{{ t.project_dir }}/{{ t.venv_name }}/bin/python manage.py db upgrade"
-#   args:
-#     chdir: "{{ t.project_dir }}"
-#   changed_when: false
+- name: Run DB migrations
+  command: "{{ v.project_dir }}/{{ v.venv_name }}/bin/python manage.py db upgrade"
+  args:
+    chdir: "{{ v.project_dir }}"
+  changed_when: false
+  tags: [ migrations, ]
 
 - name: Place celeryd config
   become: yes
