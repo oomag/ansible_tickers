@@ -1,27 +1,31 @@
 ---
 # defaults file for ansible_tickers
-tickers: 
+tickers:
   sql:
-    user: tickers
-    secret: "tickers"
-    db:
-      - "tickers_test"
-      - "tickers"
+    user: ticker
+    secret: "ticker"
+    db: "ticker"
     host: localhost
     port: 3306
 
 tickers_defaults:
-  repo_path: git@github.com:CryptoProcessing/tickers.git
+  secret_key: secret_key
+  openexchange_api_key: api_key
+  repo_path: https://github.com/CryptoProcessing/tickers.git
   project_name: ticker
   project_dir: "/var/www/tickers"
   repo_branch: master
   enable_debug: false
   # System vars
+  venv_use_pyenv: true
+  venv_pyenvrc_path: /usr/local/pyenv/.pyenvrc
   venv_name: venv
   packages:
+    - git
     - redis-server
     - python3-pip
     - python3-virtualenv
+    - python3-venv
   # SQL settings
   sql:
     user: user
@@ -47,7 +51,6 @@ tickers_defaults:
     log_dirname: /var/log/gunicorn
     log_filename: cryptoprocessing-err.log
   # Cache settings
-   redis_host: localhost
-   redis_port: 6379
-   redis_db_index: 0
- 
+  redis_host: localhost
+  redis_port: 6379
+  redis_db_index: 0
