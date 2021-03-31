@@ -31,7 +31,7 @@
   become: yes
   become_user: "{{ ansible_user }}"
   git:
-    accept_hostkey: no
+    accept_hostkey: yes
     depth: 1
     dest: "{{ v.project_dir }}"
     force: yes
@@ -44,21 +44,31 @@
 
 - name: Put project configs in place
   template:
-    src: "gunicorn_config.py.j2"
-    dest: "{{ v.project_dir }}/gunicorn_config.py"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: 0640
+  with_items:
+    - {src: 'gunicorn_config.py.j2', dest: '{{ v.project_dir }}/gunicorn_config.py'}
+    - {src: 'config.py.j2', dest: '{{ v.project_dir }}/config.py'}
   notify:
     - gunicorn restart
 
 - name: Ensure virtualenv
   become: yes
   become_user: "{{ ansible_user }}"
-  pip:
-    virtualenv: "{{ v.project_dir }}/{{ v.venv_name }}"
-    name: pip
-    state: latest
+  shell:
+    cmd: |
+      . {{ v.venv_pyenvrc_path }}
+      python -m venv {{ v.venv_name }}
+  args:
+    chdir: "{{ v.project_dir }}"
+    creates: "{{ v.project_dir }}/{{ v.venv_name }}"
+  when: v.venv_use_pyenv
+  tags:
+    - venv
+    - venv_init
 
 - name: Ensure virtualenv with project requirements
   become: yes
@@ -72,7 +82,8 @@
   args:
     chdir: "{{ v.project_dir }}"
   changed_when: false
-  tags: [ migrations, ]
+  tags:
+    - migrations
 
 - name: Place celeryd config
   become: yes

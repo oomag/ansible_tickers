@@ -1,0 +1,51 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  vars:
+    ansible_user: root
+    # MariaDB vars
+    mariadb_version: 10.4
+    mariadb_root_password: root
+    mariadb_bind_address: '127.0.0.1'
+    mariadb_slow_query_log: true
+    mariadb_max_allowed_packet: 64M
+    mariadb_max_connections: '512'
+    mariadb_max_user_connections: '510'
+    mariadb_wait_timeout: '600'
+    mariadb_users:
+      - name: ticker
+        password: ticker
+        priv: "ticker.*:ALL"
+        host: "localhost"
+        state: present
+      - name: ticker
+        password: ticker
+        priv: "ticker.*:ALL"
+        host: "127.0.0.1"
+        state: present
+    mariadb_databases:
+      - name: "ticker"
+        state: present
+    # Pyenv variables
+    pyenv_env: system
+    pyenv_path: /usr/local/pyenv
+    pyenvrc_path: "{{ pyenv_path }}/.pyenvrc"
+    pyenv_python_versions:
+      - 3.8.0
+    pyenv_global: 3.8.0
+    pyenv_virtualenvs: []
+    ansible_env:
+      USER: root
+
+  pre_tasks:
+    - name: Update apt cache.
+      apt: update_cache=true cache_valid_time=600
+      changed_when: false
+      when: ansible_os_family == 'Debian'
+
+  roles:
+    - role: sorrowless.mariadb
+    - role: avanov.pyenv
+    - role: oomag.tickers

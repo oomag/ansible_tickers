@@ -1,0 +1,93 @@
+import os
+import raven
+
+
+class SchedulerConfig:
+    JOBS = [
+        {
+            'id': 'ticker_job',
+            'func': 'controllers.tasks:ticker_job',
+            'trigger': {
+                'type': 'interval',
+                'seconds': 300
+            }
+        }
+
+    ]
+
+    SCHEDULER_EXECUTORS = {
+        'default': {'type': 'threadpool', 'max_workers': 25}
+    }
+
+    SCHEDULER_JOB_DEFAULTS = {
+        'coalesce': False,
+        'max_instances': 25
+    }
+
+    SCHEDULER_API_ENABLED = True
+
+
+class Config:
+    SECRET_KEY = '{{ v.secret_key }}'
+
+    CELERY_BROKER_URL = 'redis://{{ v.redis_host }}:{{ v.redis_port }}/{{ v.redis_db_index }}'
+    CELERY_RESULT_BACKEND = 'redis://{{ v.redis_host }}:{{ v.redis_port }}/{{ v.redis_db_index }}'
+    OPENEXCHANGERATES_API_KEY = '{{ v.openexchange_api_key }}'
+
+    CACHE_TYPE = 'redis'
+    CACHE_DEFAULT_TIMEOUT = 3600  # one hour
+    CACHE_KEY_PREFIX = '_cache'
+    CACHE_REDIS_HOST = '{{ v.redis_host }}'
+    CACHE_REDIS_PORT = '{{ v.redis_port }}'
+    CACHE_REDIS_URL = 'redis://{{ v.redis_host }}:{{ v.redis_port }}/{{ v.redis_db_index }}'
+
+
+class ProdConfig(Config, SchedulerConfig):
+    DEBUG = False
+    APP_SCHEDULER_START = True
+    MYSQL = {
+        'user': '{{ v.sql.user }}',
+        'pw': '{{ v.sql.secret }}',
+        'db': '{{ v.sql.db }}',
+        'host': '{{ v.sql.host }}',
+        'port': '{{ v.sql.port }}',
+    }
+    BCRYPT_LOG_ROUNDS = 13
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % MYSQL
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SENTRY_CONFIG = {
+        'dsn': 'https://6eed6a3f6aab4317b6337a43f589287f:4ed9a516518f42b2ae7434988853d15d@sentry.io/265553',
+        'include_paths': ['Tickers'],
+        'release': raven.fetch_git_sha(os.path.dirname(__file__)),
+    }
+    REQUEST_TIMEOUT = 5
+
+
+class DevConfig(Config, SchedulerConfig):
+    DEBUG = False
+    APP_SCHEDULER_START = True
+    MYSQL = {
+        'user': '{{ v.sql.user }}',
+        'pw': '{{ v.sql.secret }}',
+        'db': '{{ v.sql.db }}',
+        'host': '{{ v.sql.host }}',
+        'port': '{{ v.sql.port }}',
+    }
+    BCRYPT_LOG_ROUNDS = 4
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % MYSQL
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
+class TestConfig(Config):
+    DEBUG = True
+    APP_SCHEDULER_START = False
+    MYSQL = {
+        'user': '{{ v.sql.user }}',
+        'pw': '{{ v.sql.secret }}',
+        'db': 'ticker_test',
+        'host': '{{ v.sql.host }}',
+        'port': '{{ v.sql.port }}',
+    }
+    BCRYPT_LOG_ROUNDS = 4
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % MYSQL
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
