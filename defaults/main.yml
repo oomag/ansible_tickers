@@ -16,6 +16,7 @@ tickers_defaults:
   project_dir: "/var/www/tickers"
   repo_branch: master
   enable_debug: false
+  sentry_dsn: dsn
   # System vars
   venv_use_pyenv: true
   venv_pyenvrc_path: /usr/local/pyenv/.pyenvrc
